@@ -1,40 +1,79 @@
 package com.fascinate98.sweetlottiealertdialog
 
-import androidx.appcompat.app.AppCompatActivity
+import android.animation.Animator
+import android.animation.ValueAnimator
+import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieCompositionFactory
+import com.airbnb.lottie.LottieDrawable
 import com.fascinate98.library.SweetLottieAlertDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
+import java.security.AccessController.getContext
+
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var sd: SweetLottieAlertDialog
-    private lateinit var lottie: LottieAnimationView
+
+    private lateinit var sd : SweetLottieAlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        testlte.repeatCount = 0
+        testlte.setAnimation(R.raw.ok_btn_lottie)
 
-        lottie = LottieAnimationView(this)
-        lottie.setAnimation(R.raw.lottie_cryingface)
-        //lottie.setAnimation("lottie_cryingface.json")
+        testlte.addAnimatorListener(object : Animator.AnimatorListener {
 
-        testbtn.setOnClickListener {
-            sd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
-            sd.setTitleText("Congratulation!")
-            sd.setContentText("구매에 성공했어요")
-            //sd.setLottieImagebyId(com.fascinate98.sw)
-            sd.setLottieImagebyId(R.raw.lottie_cryingface)
-            //sd.setLottieAnimation(lottie!!)
-            sd.setCancelable(true)
-            sd.setConfirmText("OK")
-            sd.setCanceledOnTouchOutside(true)
+            override fun onAnimationStart(animation: Animator) {
 
-            sd.show()
+            }
+            override fun onAnimationEnd(animation: Animator) {
+                sd.dismissWithAnimation()
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {
+            }
+        })
+
+        show_btn.setOnClickListener {
+            openDialog()
         }
+    }
 
+    private fun openDialog(){
 
+        when(radioGroup.checkedRadioButtonId){
+            lottie_radio.id -> {
+                sd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE)
+                sd.setTitleText("this is lottie!")
+                sd.setContentText("WOW")
+                sd.setLottieDrawble(testlte.drawable)
+                sd.setCancelable(true)
+                sd.setConfirmText("OK")
+                sd.setCanceledOnTouchOutside(true)
+
+                sd.show()
+                testlte.playAnimation()
+            }
+            lottiebyid_radio.id -> {
+                sd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
+                sd.setTitleText("this is lottie!")
+                sd.setContentText("WOW")
+                sd.setLottieImagebyId(R.raw.lottie_cryingface, true)
+                sd.setCancelable(true)
+                sd.setConfirmText("OK")
+                sd.setCanceledOnTouchOutside(true)
+
+                sd.show()
+            }
+
+        }
     }
 }

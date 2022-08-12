@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.Lottie;
 import com.airbnb.lottie.LottieAnimationView;
+import com.airbnb.lottie.LottieDrawable;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import java.util.List;
@@ -53,7 +55,8 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private View mSuccessRightMask;
     private Drawable mCustomImgDrawable;
     private ImageView mCustomImage;
-    private int mlottieRes;
+    private LottieAnimationView mLottieAnimationView;
+
     private Button mConfirmButton;
     private Button mCancelButton;
     private Button mCustomButton;
@@ -62,9 +65,10 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private FrameLayout mWarningFrame;
     private OnSweetClickListener mCancelClickListener;
     private OnSweetClickListener mConfirmClickListener;
-    private LottieAnimationView mLottieAnimationView;
-    private LottieAnimationView mLottieView;
+    private int mlottieRes;
+    private boolean mlottieisloop;
     private boolean mCloseFromCancel;
+
 
     public static final int NORMAL_TYPE = 0;
     public static final int ERROR_TYPE = 1;
@@ -234,14 +238,10 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
                     mProgressFrame.setVisibility(View.VISIBLE);
                     mConfirmButton.setVisibility(View.GONE);
                     break;
-                case LOTTIE_TYPE:
-                    mLottieAnimationView.setVisibility(View.VISIBLE);
-                    mCustomImage.setVisibility(View.GONE);
-                    setLottieAnimation(mLottieAnimationView);
                 case LOTTIE_ID_TYPE:
                     mLottieAnimationView.setVisibility(View.VISIBLE);
                     mCustomImage.setVisibility(View.GONE);
-                    setLottieImagebyId(mlottieRes);
+                    setLottieImagebyId(mlottieRes, mlottieisloop);
             }
             if (!fromCreate) {
                 playAnimation();
@@ -270,22 +270,6 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         return this;
     }
 
-    public SweetLottieAlertDialog setCustomImage (Drawable drawable) {
-        mCustomImgDrawable = drawable;
-        if (mCustomImage != null && mCustomImgDrawable != null) {
-            mCustomImage.setVisibility(View.VISIBLE);
-            mCustomImage.setImageDrawable(mCustomImgDrawable);
-        }
-        return this;
-    }
-
-
-
-
-
-    public SweetLottieAlertDialog setCustomImage (int resourceId) {
-        return setCustomImage(getContext().getResources().getDrawable(resourceId));
-    }
 
 
     public String getContentText () {
@@ -369,30 +353,42 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         return this;
     }
 
-    public SweetLottieAlertDialog setLottieImagebyId (int lottieRes) {
-        mlottieRes = lottieRes;
 
-        if (mLottieAnimationView != null && mCustomImgDrawable != null) {
-            mLottieAnimationView.setVisibility(View.VISIBLE);
-            mLottieAnimationView.setAnimation(lottieRes);
-            mLottieAnimationView.loop(true);
-            mLottieAnimationView.playAnimation();
+    public SweetLottieAlertDialog setCustomImage (Drawable drawable) {
+        mCustomImgDrawable = drawable;
+        if (mCustomImage != null && mCustomImgDrawable != null) {
+            mCustomImage.setVisibility(View.VISIBLE);
+            mCustomImage.setImageDrawable(mCustomImgDrawable);
         }
         return this;
     }
 
-    public SweetLottieAlertDialog setLottieAnimation (LottieAnimationView lottieView){
-        mLottieView = lottieView;
+    public SweetLottieAlertDialog setLottieDrawble (Drawable drawable) {
+        mCustomImgDrawable = drawable;
+        if (mCustomImage != null && mCustomImgDrawable != null) {
+            mCustomImage.setVisibility(View.VISIBLE);
+            mCustomImage.setImageDrawable(mCustomImgDrawable);
+        }
+        return this;
+    }
 
+    public SweetLottieAlertDialog setCustomImage (int resourceId) {
+        return setCustomImage(getContext().getResources().getDrawable(resourceId));
+    }
 
-        if (mLottieAnimationView != null && mLottieView != null) {
-            mLottieAnimationView = lottieView;
+    public SweetLottieAlertDialog setLottieImagebyId (int lottieRes, boolean isLoop) {
+        mlottieRes = lottieRes;
+        mlottieisloop = isLoop;
+        if (mLottieAnimationView != null ) {
+
             mLottieAnimationView.setVisibility(View.VISIBLE);
             mLottieAnimationView.setAnimation(mlottieRes);
+            mLottieAnimationView.playAnimation();
+            mLottieAnimationView.loop(mlottieisloop);
         }
-
         return this;
     }
+
 
 
     protected void onStart() {

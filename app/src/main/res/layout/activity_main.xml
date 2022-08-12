@@ -6,23 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/show_btn"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <RadioButton
+            android:layout_weight="1"
+            android:text="lottie"
+            android:selectAllOnFocus="true"
+            android:id="@+id/lottie_radio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <RadioButton
+            android:layout_weight="1"
+            android:text="lottie by id"
+            android:id="@+id/lottiebyid_radio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+
+    </RadioGroup>
+
 
         <Button
-            android:id="@+id/testbtn"
+            android:id="@+id/show_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:text="show Dialog!"
             />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/testlte"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:lottie_rawRes="@raw/lottie_cryingface"
+        app:lottie_autoPlay="true"
+        android:visibility="gone"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

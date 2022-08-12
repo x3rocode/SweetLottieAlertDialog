@@ -27,8 +27,8 @@
         android:layout_height="53dp"
         android:layout_marginTop="5dp"
         android:contentDescription="@string/app_name"
-        app:lottie_rawRes="@raw/testlottie"
         android:visibility="gone"
+        app:lottie_autoPlay="true"
         android:scaleType="fitCenter"/>
 
     <FrameLayout
