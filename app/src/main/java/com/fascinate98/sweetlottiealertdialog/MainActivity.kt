@@ -5,6 +5,7 @@ import android.animation.ValueAnimator
 import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieCompositionFactory
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
 
         testlte.repeatCount = 0
         testlte.setAnimation(R.raw.ok_btn_lottie)
@@ -45,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         show_btn.setOnClickListener {
             openDialog()
         }
+
     }
 
     private fun openDialog(){
@@ -57,8 +61,9 @@ class MainActivity : AppCompatActivity() {
                 sd.setLottieDrawble(testlte.drawable)
                 sd.setCancelable(true)
                 sd.setConfirmText("OK")
+                sd.setPopupLottieAnimation(R.raw.lottie_falling, false)
                 sd.setCanceledOnTouchOutside(true)
-
+                sd.setPopupLottieAnimation(R.raw.lottie_congratulation, false)
                 sd.show()
                 testlte.playAnimation()
             }
@@ -66,11 +71,12 @@ class MainActivity : AppCompatActivity() {
                 sd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
                 sd.setTitleText("this is lottie!")
                 sd.setContentText("WOW")
-                sd.setLottieImagebyId(R.raw.lottie_cryingface, true)
+                sd.setLottieImagebyId(R.raw.lottie_falling, true)
                 sd.setCancelable(true)
                 sd.setConfirmText("OK")
+                sd.setPopupLottieAnimation(R.raw.lottie_falling, false)
                 sd.setCanceledOnTouchOutside(true)
-
+                sd.setCustomButtonStyle(R.drawable.custom_button_style)
                 sd.show()
             }
 

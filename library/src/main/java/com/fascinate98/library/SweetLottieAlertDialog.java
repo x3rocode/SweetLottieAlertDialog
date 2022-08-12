@@ -5,6 +5,8 @@ package com.fascinate98.library;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +45,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private String mContentText;
     private boolean mShowCancel;
     private boolean mShowContent;
+    private boolean mShowCustom;
     private String mCancelText;
     private String mConfirmText;
     private int mAlertType;
@@ -56,6 +59,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private Drawable mCustomImgDrawable;
     private ImageView mCustomImage;
     private LottieAnimationView mLottieAnimationView;
+    private LottieAnimationView mPopupLottieAnimationView;
 
     private Button mConfirmButton;
     private Button mCancelButton;
@@ -65,8 +69,10 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private FrameLayout mWarningFrame;
     private OnSweetClickListener mCancelClickListener;
     private OnSweetClickListener mConfirmClickListener;
-    private int mlottieRes;
-    private boolean mlottieisloop;
+    private int mLottieRes;
+    private int mPopupLottieRes;
+    private boolean mLottieIsLoop;
+    private boolean mPopupLottieIsLoop;
     private boolean mCloseFromCancel;
 
 
@@ -76,8 +82,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     public static final int WARNING_TYPE = 3;
     public static final int CUSTOM_IMAGE_TYPE = 4;
     public static final int PROGRESS_TYPE = 5;
-    public static final int LOTTIE_TYPE = 6;
-    public static final int LOTTIE_ID_TYPE = 7;
+    public static final int LOTTIE_ID_TYPE = 6;
 
     public static interface OnSweetClickListener {
         public void onClick (SweetLottieAlertDialog sweetAlertDialog);
@@ -146,6 +151,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
             }
         };
         mOverlayOutAnim.setDuration(120);
+
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,19 +172,22 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mWarningFrame = (FrameLayout)findViewById(R.id.warning_frame);
         mConfirmButton = (Button)findViewById(R.id.confirm_button);
         mCancelButton = (Button)findViewById(R.id.cancel_button);
+        mCustomButton = (Button)findViewById(R.id.custom_button);
         mLottieAnimationView = (LottieAnimationView)findViewById(R.id.custom_lottie_view);
         mProgressHelper.setProgressWheel((ProgressWheel)findViewById(R.id.progressWheel));
-        mCustomButton = (Button)findViewById(R.id.custom_button);
+        mPopupLottieAnimationView = (LottieAnimationView)findViewById(R.id.popup_lottie_view);
 
         mConfirmButton.setOnClickListener(this);
         mCancelButton.setOnClickListener(this);
+        mCustomButton.setOnClickListener(this);
 
         setTitleText(mTitleText);
         setContentText(mContentText);
         setCancelText(mCancelText);
         setConfirmText(mConfirmText);
         changeAlertType(mAlertType, true);
-
+        setPopupLottieAnimation(mPopupLottieRes, mPopupLottieIsLoop);
+        setCustomButtonStyle(mButtonStyle);
     }
 
     private void restore () {
@@ -187,9 +196,10 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mSuccessFrame.setVisibility(View.GONE);
         mWarningFrame.setVisibility(View.GONE);
         mProgressFrame.setVisibility(View.GONE);
-        mConfirmButton.setVisibility(View.VISIBLE);
-
+        mConfirmButton.setVisibility(View.GONE);
+        mCustomButton.setVisibility(View.VISIBLE);
         mConfirmButton.setBackgroundResource(R.drawable.blue_button_background);
+        mCustomButton.setBackgroundResource(mButtonStyle);
         mErrorFrame.clearAnimation();
         mErrorX.clearAnimation();
         mSuccessTick.clearAnimation();
@@ -241,7 +251,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
                 case LOTTIE_ID_TYPE:
                     mLottieAnimationView.setVisibility(View.VISIBLE);
                     mCustomImage.setVisibility(View.GONE);
-                    setLottieImagebyId(mlottieRes, mlottieisloop);
+                    setLottieImagebyId(mLottieRes, mLottieIsLoop);
             }
             if (!fromCreate) {
                 playAnimation();
@@ -309,6 +319,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         return this;
     }
 
+
     public String getCancelText () {
         return mCancelText;
     }
@@ -337,7 +348,11 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     public SweetLottieAlertDialog setCustomButtonStyle(int buttonStyle ){
         mButtonStyle = buttonStyle;
         if(mCustomButton != null ){
-            mCustomButton = new Button(new ContextThemeWrapper(getContext(), mButtonStyle), null, mButtonStyle);
+            mCancelButton.setVisibility(View.GONE);
+            mConfirmButton.setVisibility(View.GONE);
+            mCustomButton.setVisibility(View.VISIBLE);
+            //mCustomButton = new Button(new ContextThemeWrapper(getContext(), mButtonStyle), null, mButtonStyle);
+            mCustomButton.setBackgroundResource(mButtonStyle);
         }
 
         return this;
@@ -377,14 +392,30 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     }
 
     public SweetLottieAlertDialog setLottieImagebyId (int lottieRes, boolean isLoop) {
-        mlottieRes = lottieRes;
-        mlottieisloop = isLoop;
+        mLottieRes = lottieRes;
+        mLottieIsLoop = isLoop;
+
         if (mLottieAnimationView != null ) {
 
             mLottieAnimationView.setVisibility(View.VISIBLE);
-            mLottieAnimationView.setAnimation(mlottieRes);
+
+            mLottieAnimationView.setAnimation(mLottieRes);
             mLottieAnimationView.playAnimation();
-            mLottieAnimationView.loop(mlottieisloop);
+            mLottieAnimationView.loop(mLottieIsLoop);
+        }
+        return this;
+    }
+
+    public SweetLottieAlertDialog setPopupLottieAnimation (int lottieRes, boolean isLoop) {
+        mPopupLottieRes = lottieRes;
+        mPopupLottieIsLoop = isLoop;
+
+        if (mPopupLottieAnimationView != null ) {
+
+            mPopupLottieAnimationView.setVisibility(View.VISIBLE);
+            mPopupLottieAnimationView.setAnimation(mPopupLottieRes);
+            mPopupLottieAnimationView.playAnimation();
+            mPopupLottieAnimationView.loop(mPopupLottieIsLoop);
         }
         return this;
     }
@@ -414,6 +445,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private void dismissWithAnimation(boolean fromCancel) {
         mCloseFromCancel = fromCancel;
         mConfirmButton.startAnimation(mOverlayOutAnim);
+        mCustomButton.startAnimation(mOverlayOutAnim);
         mDialogView.startAnimation(mModalOutAnim);
     }
 
@@ -426,6 +458,12 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
                 dismissWithAnimation();
             }
         } else if (v.getId() == R.id.confirm_button) {
+            if (mConfirmClickListener != null) {
+                mConfirmClickListener.onClick(SweetLottieAlertDialog.this);
+            } else {
+                dismissWithAnimation();
+            }
+        } else if (v.getId() == R.id.custom_button) {
             if (mConfirmClickListener != null) {
                 mConfirmClickListener.onClick(SweetLottieAlertDialog.this);
             } else {
