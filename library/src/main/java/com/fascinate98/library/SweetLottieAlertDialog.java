@@ -187,7 +187,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         setConfirmText(mConfirmText);
         changeAlertType(mAlertType, true);
         setPopupLottieAnimation(mPopupLottieRes, mPopupLottieIsLoop);
-        setCustomButtonStyle(mButtonStyle);
+       // setCustomButtonStyle(mButtonStyle);
     }
 
     private void restore () {
@@ -199,7 +199,6 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mConfirmButton.setVisibility(View.GONE);
         mCustomButton.setVisibility(View.VISIBLE);
         mConfirmButton.setBackgroundResource(R.drawable.blue_button_background);
-        mCustomButton.setBackgroundResource(mButtonStyle);
         mErrorFrame.clearAnimation();
         mErrorX.clearAnimation();
         mSuccessTick.clearAnimation();
@@ -410,7 +409,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mPopupLottieRes = lottieRes;
         mPopupLottieIsLoop = isLoop;
 
-        if (mPopupLottieAnimationView != null ) {
+        if (mPopupLottieRes != 0 && mPopupLottieAnimationView != null) {
 
             mPopupLottieAnimationView.setVisibility(View.VISIBLE);
             mPopupLottieAnimationView.setAnimation(mPopupLottieRes);

@@ -61,9 +61,9 @@ class MainActivity : AppCompatActivity() {
                 sd.setLottieDrawble(testlte.drawable)
                 sd.setCancelable(true)
                 sd.setConfirmText("OK")
-                sd.setPopupLottieAnimation(R.raw.lottie_falling, false)
+
                 sd.setCanceledOnTouchOutside(true)
-                sd.setPopupLottieAnimation(R.raw.lottie_congratulation, false)
+                //sd.setPopupLottieAnimation(R.raw.lottie_congratulation, false)
                 sd.show()
                 testlte.playAnimation()
             }
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                 sd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
                 sd.setTitleText("this is lottie!")
                 sd.setContentText("WOW")
-                sd.setLottieImagebyId(R.raw.lottie_falling, true)
+                sd.setLottieImagebyId(R.raw.lottie_cryingface, true)
                 sd.setCancelable(true)
                 sd.setConfirmText("OK")
                 sd.setPopupLottieAnimation(R.raw.lottie_falling, false)
