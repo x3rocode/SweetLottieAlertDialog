@@ -5,12 +5,17 @@ package com.fascinate98.library;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,7 +26,10 @@ import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import com.airbnb.lottie.Lottie;
 import com.airbnb.lottie.LottieAnimationView;
@@ -40,14 +48,18 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private AnimationSet mSuccessLayoutAnimSet;
     private Animation mSuccessBowAnim;
     private TextView mTitleTextView;
+    private View mCustomView;
     private TextView mContentTextView;
     private String mTitleText;
     private String mContentText;
     private boolean mShowCancel;
+    private LinearLayout mButtonsContainer;
     private boolean mShowContent;
     private boolean mShowCustom;
+    private FrameLayout mCustomViewContainer;
     private String mCancelText;
     private String mConfirmText;
+    private String mCustomText;
     private int mAlertType;
     private FrameLayout mErrorFrame;
     private FrameLayout mSuccessFrame;
@@ -64,17 +76,33 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private Button mConfirmButton;
     private Button mCancelButton;
     private Button mCustomButton;
-    private int mButtonStyle;
+    private boolean mHideConfirmButton = false;
+    private Integer fontResource;
+    private Integer mConfirmButtonBackgroundColor;
+    private Integer mConfirmButtonTextColor;
+    private Integer mNeutralButtonBackgroundColor;
+    private Integer mNeutralButtonTextColor;
+    private Integer mCancelButtonBackgroundColor;
+    private Integer mCancelButtonTextColor;
     private ProgressHelper mProgressHelper;
     private FrameLayout mWarningFrame;
     private OnSweetClickListener mCancelClickListener;
     private OnSweetClickListener mConfirmClickListener;
+    private OnSweetClickListener mCustomClickListener;
+    private boolean mHideKeyBoardOnDismiss = true;
+    private int contentTextSize = 0;
     private int mLottieRes;
     private int mPopupLottieRes;
     private boolean mLottieIsLoop;
     private boolean mPopupLottieIsLoop;
     private boolean mCloseFromCancel;
+    private float mPopupLottieElevation;
+    //aliases
+    public final static int BUTTON_CONFIRM = DialogInterface.BUTTON_POSITIVE;
+    public final static int BUTTON_CANCEL = DialogInterface.BUTTON_NEGATIVE;
 
+    private final float defStrokeWidth;
+    private float strokeWidth = 0;
 
     public static final int NORMAL_TYPE = 0;
     public static final int ERROR_TYPE = 1;
@@ -84,15 +112,37 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     public static final int PROGRESS_TYPE = 5;
     public static final int LOTTIE_ID_TYPE = 6;
 
-    public static interface OnSweetClickListener {
-        public void onClick (SweetLottieAlertDialog sweetAlertDialog);
+
+    public static boolean DARK_STYLE = false;
+
+
+
+
+    public interface OnSweetClickListener {
+        void onClick(SweetLottieAlertDialog sweetLottieAlertDialog);
+    }
+
+    public SweetLottieAlertDialog(Context context) {
+        this(context, NORMAL_TYPE);
+    }
+
+    public SweetLottieAlertDialog hideConfirmButton() {
+        this.mHideConfirmButton = true;
+        return this;
     }
 
 
+
     public SweetLottieAlertDialog(Context context, int alertType) {
-        super(context, R.style.alert_dialog);
+        super(context, DARK_STYLE ? R.style.alert_dialog_dark : R.style.alert_dialog_light);
         setCancelable(true);
         setCanceledOnTouchOutside(false);
+
+
+
+        defStrokeWidth = getContext().getResources().getDimension(R.dimen.buttons_stroke_width);
+        strokeWidth = defStrokeWidth;
+
         mProgressHelper = new ProgressHelper(context);
         mAlertType = alertType;
         mErrorInAnim = OptAnimationLoader.loadAnimation(getContext(), R.anim.error_frame_in);
@@ -161,6 +211,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mDialogView = getWindow().getDecorView().findViewById(android.R.id.content);
         mTitleTextView = (TextView)findViewById(R.id.title_text);
         mContentTextView = (TextView)findViewById(R.id.content_text);
+        mCustomViewContainer = findViewById(R.id.custom_view_container);
         mErrorFrame = (FrameLayout)findViewById(R.id.error_frame);
         mErrorX = (ImageView)mErrorFrame.findViewById(R.id.error_x);
         mSuccessFrame = (FrameLayout)findViewById(R.id.success_frame);
@@ -176,18 +227,28 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mLottieAnimationView = (LottieAnimationView)findViewById(R.id.custom_lottie_view);
         mProgressHelper.setProgressWheel((ProgressWheel)findViewById(R.id.progressWheel));
         mPopupLottieAnimationView = (LottieAnimationView)findViewById(R.id.popup_lottie_view);
-
+        mButtonsContainer = findViewById(R.id.buttons_container);
         mConfirmButton.setOnClickListener(this);
         mCancelButton.setOnClickListener(this);
         mCustomButton.setOnClickListener(this);
+
 
         setTitleText(mTitleText);
         setContentText(mContentText);
         setCancelText(mCancelText);
         setConfirmText(mConfirmText);
+        setCustomView(mCustomView);
+        setCustomText(mCustomText);
         changeAlertType(mAlertType, true);
-        setPopupLottieAnimation(mPopupLottieRes, mPopupLottieIsLoop);
-       // setCustomButtonStyle(mButtonStyle);
+        setPopupLottieAnimation(mPopupLottieRes, mPopupLottieIsLoop, mPopupLottieElevation);
+        applyStroke();
+        setConfirmButtonBackgroundColor(mConfirmButtonBackgroundColor);
+        setConfirmButtonTextColor(mConfirmButtonTextColor);
+        setCancelButtonBackgroundColor(mCancelButtonBackgroundColor);
+        setCancelButtonTextColor(mCancelButtonTextColor);
+        setNeutralButtonBackgroundColor(mNeutralButtonBackgroundColor);
+        setNeutralButtonTextColor(mNeutralButtonTextColor);
+        changeAlertType(mAlertType, true);
     }
 
     private void restore () {
@@ -196,14 +257,34 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mSuccessFrame.setVisibility(View.GONE);
         mWarningFrame.setVisibility(View.GONE);
         mProgressFrame.setVisibility(View.GONE);
-        mConfirmButton.setVisibility(View.GONE);
-        mCustomButton.setVisibility(View.VISIBLE);
+
+        mConfirmButton.setVisibility(mHideConfirmButton ? View.GONE : View.VISIBLE);
+
+        adjustButtonContainerVisibility();
+
         mConfirmButton.setBackgroundResource(R.drawable.blue_button_background);
         mErrorFrame.clearAnimation();
         mErrorX.clearAnimation();
         mSuccessTick.clearAnimation();
         mSuccessLeftMask.clearAnimation();
         mSuccessRightMask.clearAnimation();
+    }
+
+    /**
+     * Hides buttons container if all buttons are invisible or gone.
+     * This deletes useless margins
+     */
+    private void adjustButtonContainerVisibility() {
+        boolean showButtonsContainer = false;
+        for (int i = 0; i < mButtonsContainer.getChildCount(); i++) {
+            View view = mButtonsContainer.getChildAt(i);
+            if (view instanceof Button && view.getVisibility() == View.VISIBLE) {
+                showButtonsContainer = true;
+                break;
+            }
+        }
+        mButtonsContainer.setVisibility(View.VISIBLE);
+       // mButtonsContainer.setVisibility(showButtonsContainer ? View.VISIBLE : View.GONE);
     }
 
     private void playAnimation () {
@@ -224,6 +305,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
                 // restore all of views state before switching alert type
                 restore();
             }
+            mConfirmButton.setVisibility(mHideConfirmButton ? View.GONE : View.VISIBLE);
             switch (mAlertType) {
                 case ERROR_TYPE:
                     mErrorFrame.setVisibility(View.VISIBLE);
@@ -235,7 +317,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
                     mSuccessRightMask.startAnimation(mSuccessLayoutAnimSet.getAnimations().get(1));
                     break;
                 case WARNING_TYPE:
-                    mConfirmButton.setBackgroundResource(R.drawable.red_button_background);
+                    //mConfirmButton.setBackgroundResource(R.drawable.red_button_background);
                     mWarningFrame.setVisibility(View.VISIBLE);
                     break;
                 case CUSTOM_IMAGE_TYPE:
@@ -294,6 +376,29 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         return this;
     }
 
+
+    public static int spToPx(float sp, Context context) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+    }
+
+    /**
+     * @param width in SP
+     */
+    public SweetLottieAlertDialog setStrokeWidth(float width) {
+        this.strokeWidth = spToPx(width, getContext());
+        return this;
+    }
+
+    private void applyStroke() {
+        if (Float.compare(defStrokeWidth, strokeWidth) != 0) {
+            Resources r = getContext().getResources();
+            setButtonBackgroundColor(mConfirmButton, r.getColor(R.color.main_green_color));
+            setButtonBackgroundColor(mCustomButton, r.getColor(R.color.main_disabled_color));
+            setButtonBackgroundColor(mCancelButton, r.getColor(R.color.red_btn_bg_color));
+        }
+    }
+
+
     public boolean isShowCancelButton () {
         return mShowCancel;
     }
@@ -344,18 +449,117 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         return this;
     }
 
-    public SweetLottieAlertDialog setCustomButtonStyle(int buttonStyle ){
-        mButtonStyle = buttonStyle;
-        if(mCustomButton != null ){
-            mCancelButton.setVisibility(View.GONE);
-            mConfirmButton.setVisibility(View.GONE);
-            mCustomButton.setVisibility(View.VISIBLE);
-            //mCustomButton = new Button(new ContextThemeWrapper(getContext(), mButtonStyle), null, mButtonStyle);
-            mCustomButton.setBackgroundResource(mButtonStyle);
+    public String getCustomText () {
+        return mCustomText;
+    }
+
+    public SweetLottieAlertDialog setCustomText (String text) {
+        mCustomText = text;
+        if (mCustomButton != null && mCustomText != null) {
+            mCustomButton.setText(mCustomText);
+        }
+        return this;
+    }
+
+//button sett
+    public SweetLottieAlertDialog setConfirmButtonBackgroundColor(Integer color) {
+        mConfirmButtonBackgroundColor = color;
+        setButtonBackgroundColor(mConfirmButton, color);
+        return this;
+}
+
+    public Integer getConfirmButtonBackgroundColor() {
+        return mConfirmButtonBackgroundColor;
+    }
+
+    public SweetLottieAlertDialog setNeutralButtonBackgroundColor(Integer color) {
+        mNeutralButtonBackgroundColor = color;
+        setButtonBackgroundColor(mCustomButton, color);
+        return this;
+    }
+
+    public Integer getNeutralButtonBackgroundColor() {
+        return mNeutralButtonBackgroundColor;
+    }
+
+    public SweetLottieAlertDialog setCancelButtonBackgroundColor(Integer color) {
+        mCancelButtonBackgroundColor = color;
+        setButtonBackgroundColor(mCancelButton, color);
+        return this;
+    }
+
+    public Integer getCancelButtonBackgroundColor() {
+        return mCancelButtonBackgroundColor;
+    }
+
+    public SweetLottieAlertDialog setButtonTextFont(Integer font){
+        if(fontResource != null){
+            fontResource = font;
+            Typeface typeface = getContext().getResources().getFont(fontResource);
+            mConfirmButton.setTypeface(typeface);
+
         }
 
         return this;
     }
+
+    private void setButtonBackgroundColor(Button btn, Integer color) {
+        if (btn != null && color != null) {
+            Drawable[] drawableItems = ViewUtils.getDrawable(btn);
+            if (drawableItems != null) {
+                GradientDrawable gradientDrawableUnChecked = (GradientDrawable) drawableItems[1];
+                //solid color
+                gradientDrawableUnChecked.setColor(color);
+                //stroke
+                gradientDrawableUnChecked.setStroke((int) strokeWidth, genStrokeColor(color));
+            }
+        }
+    }
+
+    private int genStrokeColor(int color) {
+        float hsv[] = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.7f; // decrease value component
+        return Color.HSVToColor(hsv);
+    }
+
+    public SweetLottieAlertDialog setConfirmButtonTextColor(Integer color) {
+        mConfirmButtonTextColor = color;
+        if (mConfirmButton != null && color != null) {
+            mConfirmButton.setTextColor(mConfirmButtonTextColor);
+        }
+        return this;
+    }
+
+    public Integer getConfirmButtonTextColor() {
+        return mConfirmButtonTextColor;
+    }
+
+    public SweetLottieAlertDialog setNeutralButtonTextColor(Integer color) {
+        mNeutralButtonTextColor = color;
+        if (mCustomButton != null && color != null) {
+            mCustomButton.setTextColor(mNeutralButtonTextColor);
+        }
+        return this;
+    }
+
+    public Integer getNeutralButtonTextColor() {
+        return mNeutralButtonTextColor;
+    }
+
+    public SweetLottieAlertDialog setCancelButtonTextColor(Integer color) {
+        mCancelButtonTextColor = color;
+        if (mCancelButton != null && color != null) {
+            mCancelButton.setTextColor(mCancelButtonTextColor);
+        }
+        return this;
+    }
+
+    public Integer getCancelButtonTextColor() {
+        return mCancelButtonTextColor;
+    }
+
+
 
     public SweetLottieAlertDialog setCancelClickListener (OnSweetClickListener listener) {
         mCancelClickListener = listener;
@@ -364,6 +568,11 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
 
     public SweetLottieAlertDialog setConfirmClickListener (OnSweetClickListener listener) {
         mConfirmClickListener = listener;
+        return this;
+    }
+
+    public SweetLottieAlertDialog setCustomClickListener (OnSweetClickListener listener) {
+        mCustomClickListener = listener;
         return this;
     }
 
@@ -405,15 +614,17 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         return this;
     }
 
-    public SweetLottieAlertDialog setPopupLottieAnimation (int lottieRes, boolean isLoop) {
+    public SweetLottieAlertDialog setPopupLottieAnimation (int lottieRes, boolean isLoop, float popupLottieElevation) {
         mPopupLottieRes = lottieRes;
         mPopupLottieIsLoop = isLoop;
+        mPopupLottieElevation = popupLottieElevation;
 
         if (mPopupLottieRes != 0 && mPopupLottieAnimationView != null) {
 
             mPopupLottieAnimationView.setVisibility(View.VISIBLE);
             mPopupLottieAnimationView.setAnimation(mPopupLottieRes);
             mPopupLottieAnimationView.playAnimation();
+            mPopupLottieAnimationView.setElevation(mPopupLottieElevation);
             mPopupLottieAnimationView.loop(mPopupLottieIsLoop);
         }
         return this;
@@ -421,11 +632,87 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
 
 
 
+
+
+    public Button getButton(int buttonType) {
+        switch (buttonType) {
+            default:
+            case BUTTON_CONFIRM:
+                return mConfirmButton;
+            case BUTTON_CANCEL:
+                return mCancelButton;
+            case BUTTON_NEUTRAL:
+                return mCustomButton;
+        }
+    }
+
+    public SweetLottieAlertDialog setConfirmButton(String text, OnSweetClickListener listener) {
+        this.setConfirmText(text);
+        this.setConfirmClickListener(listener);
+        return this;
+    }
+
+    public SweetLottieAlertDialog setConfirmButton(int resId, OnSweetClickListener listener) {
+        String text = getContext().getResources().getString(resId);
+        setConfirmButton(text, listener);
+        return this;
+    }
+
+
+    public SweetLottieAlertDialog setCancelButton(String text, OnSweetClickListener listener) {
+        this.setCancelText(text);
+        this.setCancelClickListener(listener);
+        return this;
+    }
+
+    public SweetLottieAlertDialog setCancelButton(int resId, OnSweetClickListener listener) {
+        String text = getContext().getResources().getString(resId);
+        setCancelButton(text, listener);
+        return this;
+    }
+
+    public SweetLottieAlertDialog setCustomButton(String text, OnSweetClickListener listener) {
+        this.setCustomText(text);
+        this.setCustomClickListener(listener);
+        return this;
+    }
+
+    public SweetLottieAlertDialog setCustomButton(int resId, OnSweetClickListener listener) {
+        String text = getContext().getResources().getString(resId);
+        setCustomButton(text, listener);
+        return this;
+    }
+
+
+
+    /**
+     * Set content text size
+     *
+     * @param value text size in sp
+     */
+    public SweetLottieAlertDialog setContentTextSize(int value) {
+        this.contentTextSize = value;
+        return this;
+    }
+
+    public int getContentTextSize() {
+        return contentTextSize;
+    }
+
+
     protected void onStart() {
         mDialogView.startAnimation(mModalInAnim);
         playAnimation();
     }
-
+    public SweetLottieAlertDialog setCustomView(View view) {
+        mCustomView = view;
+        if (mCustomView != null && mCustomViewContainer != null) {
+            mCustomViewContainer.addView(view);
+            mCustomViewContainer.setVisibility(View.VISIBLE);
+            mContentTextView.setVisibility(View.GONE);
+        }
+        return this;
+    }
     /**
      * The real Dialog.cancel() will be invoked async-ly after the animation finishes.
      */
