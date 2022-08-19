@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -48,32 +50,70 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
             findViewById<Button>(id).setOnTouchListener(Constants.FOCUS_TOUCH_LISTENER)
         }
 
-        lottie_test.repeatCount = 0
-        lottie_test.setAnimation(R.raw.ok_btn_lottie)
-
-        lottie_test.addAnimatorListener(object : Animator.AnimatorListener {
-
-            override fun onAnimationStart(animation: Animator) {
-
-            }
-            override fun onAnimationEnd(animation: Animator) {
-                sd.dismissWithAnimation()
-            }
-
-            override fun onAnimationCancel(animation: Animator) {
-            }
-
-            override fun onAnimationRepeat(animation: Animator) {
-            }
-        })
-
-
-
     }
 
 
     override fun onClick(v: View) {
         when (v.id) {
+            
+            basic_lottie_test.id -> {
+                val lsd =  SweetLottieAlertDialog(this, SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE)
+                lottie_test.addAnimatorListener(object : Animator.AnimatorListener {
+
+                    override fun onAnimationStart(animation: Animator) {
+
+                    }
+                    override fun onAnimationEnd(animation: Animator) {
+                        lsd.dismissWithAnimation()
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator) {
+                    }
+                })
+
+                lsd.contentText = "Success!"
+                lsd.setLottieDrawble(lottie_test.drawable)
+                lsd.setCancelable(true)
+                lsd.setButtonTextFont(R.font.rix_font)
+                lsd.setCanceledOnTouchOutside(true)
+                lsd.show()
+                lottie_test.playAnimation()
+
+            }
+            basic_lottie_by_id_test.id -> {
+                val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
+                lsd2.contentText = "Try Again!"
+                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true, null)
+                lsd2.setCancelable(true)
+                lsd2.confirmText = "OK"
+                lsd2.setCanceledOnTouchOutside(true)
+                lsd2.setButtonTextFont(R.font.lexend_deca)
+                lsd2.show()
+            }
+            basic_lottie_popup_test.id -> {
+                val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
+                lsd2.contentText = "Congratulation!"
+                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true, null)
+                lsd2.setCancelable(true)
+                lsd2.setPopupLottieAnimation(R.raw.lottie_congratulation, false, 999f)
+                lsd2.setCanceledOnTouchOutside(true)
+                lsd2.setButtonTextFont(R.font.lexend_deca)
+                lsd2.show()
+            }
+
+            popup_lottie_behind_test.id -> {
+                val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
+                lsd2.contentText = "Lottie is behind the dialog"
+                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true, null)
+                lsd2.setCancelable(true)
+                lsd2.setPopupLottieAnimation(R.raw.lottie_money, true, 0f)
+                lsd2.setCanceledOnTouchOutside(true)
+                lsd2.setButtonTextFont(R.font.lexend_deca)
+                lsd2.show()
+            }
             basic_test.id -> {
                 val sd = SweetLottieAlertDialog(this)
                 sd.setCancelable(true)
@@ -89,52 +129,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
                 sd2.hideConfirmButton()
                 sd2.show()
             }
-            basic_lottie_popup_test.id -> {
-                val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
-                lsd2.setTitleText("this is lottie!")
-                lsd2.setContentText("WOW")
-                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true)
-                lsd2.setCancelable(true)
-                lsd2.setPopupLottieAnimation(R.raw.lottie_congratulation, false, 999f)
-                lsd2.setCanceledOnTouchOutside(true)
-                lsd2.setButtonTextFont(R.font.lexend_deca)
-                lsd2.show()
-            }
-            basic_lottie_test.id -> {
-                val lsd =  SweetLottieAlertDialog(this, SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE)
-                lsd.setTitleText("this is lottie!")
-                lsd.setLottieDrawble(lottie_test.drawable)
-                lsd.setCancelable(true)
-                lsd.setConfirmText("OK")
-                lsd.setButtonTextFont(R.font.lexend_deca)
-                lsd.setCanceledOnTouchOutside(true)
-                lsd.show()
-                lottie_test.playAnimation()
-            }
-            basic_lottie_by_id_test.id -> {
-                val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
-                lsd2.setTitleText("this is lottie!")
-                lsd2.setContentText("WOW")
-                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true)
-                lsd2.setCancelable(true)
-                lsd2.setConfirmText("OK")
-                lsd2.setCanceledOnTouchOutside(true)
-                lsd2.setButtonTextFont(R.font.lexend_deca)
-                lsd2.show()
-            }
-
-            popup_lottie_behind_test.id -> {
-                val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
-                lsd2.setTitleText("this is lottie!")
-                lsd2.setContentText("WOW")
-                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true)
-                lsd2.setCancelable(true)
-                lsd2.setPopupLottieAnimation(R.raw.lottie_congratulation, false, 0f)
-                lsd2.setCanceledOnTouchOutside(true)
-                lsd2.setButtonTextFont(R.font.lexend_deca)
-                lsd2.show()
-            }
-
             under_text_test.id -> SweetLottieAlertDialog(this, SweetLottieAlertDialog.NORMAL_TYPE)
                 .setTitleText("Title")
                 .setContentText("It's pretty, isn't it?")

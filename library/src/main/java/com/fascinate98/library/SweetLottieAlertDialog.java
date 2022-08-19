@@ -3,6 +3,7 @@ package com.fascinate98.library;
 
 
 
+import android.animation.Animator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -94,6 +95,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
     private int mLottieRes;
     private int mPopupLottieRes;
     private boolean mLottieIsLoop;
+    private Animator.AnimatorListener mLottieAnimatorListner;
     private boolean mPopupLottieIsLoop;
     private boolean mCloseFromCancel;
     private float mPopupLottieElevation;
@@ -332,7 +334,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
                 case LOTTIE_ID_TYPE:
                     mLottieAnimationView.setVisibility(View.VISIBLE);
                     mCustomImage.setVisibility(View.GONE);
-                    setLottieImagebyId(mLottieRes, mLottieIsLoop);
+                    setLottieImagebyId(mLottieRes, mLottieIsLoop, mLottieAnimatorListner);
             }
             if (!fromCreate) {
                 playAnimation();
@@ -599,10 +601,10 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         return setCustomImage(getContext().getResources().getDrawable(resourceId));
     }
 
-    public SweetLottieAlertDialog setLottieImagebyId (int lottieRes, boolean isLoop) {
+    public SweetLottieAlertDialog setLottieImagebyId (int lottieRes, boolean isLoop, Animator.AnimatorListener listner) {
         mLottieRes = lottieRes;
         mLottieIsLoop = isLoop;
-
+        mLottieAnimatorListner = listner;
         if (mLottieAnimationView != null ) {
 
             mLottieAnimationView.setVisibility(View.VISIBLE);
@@ -610,6 +612,10 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
             mLottieAnimationView.setAnimation(mLottieRes);
             mLottieAnimationView.playAnimation();
             mLottieAnimationView.loop(mLottieIsLoop);
+            if(mLottieAnimatorListner != null){
+                mLottieAnimationView.addAnimatorListener(mLottieAnimatorListner);
+            }
+
         }
         return this;
     }
