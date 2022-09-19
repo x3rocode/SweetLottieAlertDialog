@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
         when (v.id) {
             
             basic_lottie_test.id -> {
+                lottie_test.visibility= View.VISIBLE
                 val lsd =  SweetLottieAlertDialog(this, SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE)
                 lottie_test.addAnimatorListener(object : Animator.AnimatorListener {
 
@@ -96,7 +97,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
             basic_lottie_popup_test.id -> {
                 val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
                 lsd2.contentText = "Congratulation!"
-                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true, null)
+                lsd2.setLottieImagebyId(R.raw.lottie_happyface, true, null)
                 lsd2.setCancelable(true)
                 lsd2.setPopupLottieAnimation(R.raw.lottie_congratulation, false, 999f)
                 lsd2.setCanceledOnTouchOutside(true)
