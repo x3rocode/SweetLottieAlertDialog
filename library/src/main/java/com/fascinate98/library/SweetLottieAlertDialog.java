@@ -19,6 +19,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -210,6 +211,8 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alert_dialog);
 
+
+
         mDialogView = getWindow().getDecorView().findViewById(android.R.id.content);
         mTitleTextView = (TextView)findViewById(R.id.title_text);
         mContentTextView = (TextView)findViewById(R.id.content_text);
@@ -342,7 +345,7 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         }
     }
 
-    public int getAlerType () {
+    public int getAlertType () {
         return mAlertType;
     }
 
@@ -626,7 +629,6 @@ public class SweetLottieAlertDialog extends Dialog implements View.OnClickListen
         mPopupLottieElevation = popupLottieElevation;
 
         if (mPopupLottieRes != 0 && mPopupLottieAnimationView != null) {
-
             mPopupLottieAnimationView.setVisibility(View.VISIBLE);
             mPopupLottieAnimationView.setAnimation(mPopupLottieRes);
             mPopupLottieAnimationView.playAnimation();

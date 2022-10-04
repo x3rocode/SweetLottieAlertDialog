@@ -53,6 +53,12 @@
                 android:text="A basic message" />
 
             <Button
+                android:id="@+id/button1"
+                style="@style/dialog_blue_button"
+                android:layout_margin="10dp"
+                android:text="Try me!" />
+
+            <Button
                 android:id="@+id/basic_test"
                 style="@style/dialog_blue_button"
                 android:layout_margin="10dp"

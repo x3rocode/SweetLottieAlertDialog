@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.provider.SyncStateContract
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -13,15 +14,14 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.fascinate98.library.Constants
 import com.fascinate98.library.SweetLottieAlertDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 
 
-class MainActivity : AppCompatActivity(), View.OnClickListener  {
+class MainActivity : AppCompatActivity() , View.OnClickListener{
 
-    private lateinit var sd : SweetLottieAlertDialog
+    private lateinit var sd: SweetLottieAlertDialog
     private var i = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,23 +47,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
         )
         for (id in btnIds) {
             findViewById<Button>(id).setOnClickListener ( this )
-            findViewById<Button>(id).setOnTouchListener(Constants.FOCUS_TOUCH_LISTENER)
+           // findViewById<Button>(id).setOnTouchListener(SyncStateContract.Constants.FOCUS_TOUCH_LISTENER)
         }
+
+        button1.setOnClickListener {
+            val lsd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.NORMAL_TYPE)
+            //text in alert
+            lsd.contentText = "Congratulation!"
+            //set full screen lottie.
+            //setPopupLottieAnimation(your_lottie_res, isLoop(boolean), elevation);
+            lsd.setPopupLottieAnimation(R.raw.lottie_congratulation, false, 999f)
+            lsd.show()
+        }
+
 
     }
 
 
     override fun onClick(v: View) {
         when (v.id) {
-            
+
             basic_lottie_test.id -> {
-                lottie_test.visibility= View.VISIBLE
-                val lsd =  SweetLottieAlertDialog(this, SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE)
+                lottie_test.visibility = View.VISIBLE
+                val lsd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE)
                 lottie_test.addAnimatorListener(object : Animator.AnimatorListener {
 
                     override fun onAnimationStart(animation: Animator) {
 
                     }
+
                     override fun onAnimationEnd(animation: Animator) {
                         lsd.dismissWithAnimation()
                     }
@@ -85,24 +97,39 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
 
             }
             basic_lottie_by_id_test.id -> {
+                //1. you have to set type SweetLottieAlertDialog.LOTTIE_ID_TYPE.
                 val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
-                lsd2.contentText = "Try Again!"
-                lsd2.setLottieImagebyId(R.raw.lottie_cryingface, true, null)
+                //2. setLottieImagebyId(your_lottie_res, isLoop(boolean), listner)
+                lsd2.setLottieImagebyId(R.raw.ok_btn_lottie, false, object : Animator.AnimatorListener {
+
+                    override fun onAnimationStart(animation: Animator) {
+
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        lsd2.dismissWithAnimation()
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator) {
+                    }
+                })
+                lsd2.contentText = "Success!"
                 lsd2.setCancelable(true)
-                lsd2.confirmText = "OK"
                 lsd2.setCanceledOnTouchOutside(true)
-                lsd2.setButtonTextFont(R.font.lexend_deca)
                 lsd2.show()
             }
             basic_lottie_popup_test.id -> {
-                val lsd2 = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
-                lsd2.contentText = "Congratulation!"
-                lsd2.setLottieImagebyId(R.raw.lottie_happyface, true, null)
-                lsd2.setCancelable(true)
-                lsd2.setPopupLottieAnimation(R.raw.lottie_congratulation, false, 999f)
-                lsd2.setCanceledOnTouchOutside(true)
-                lsd2.setButtonTextFont(R.font.lexend_deca)
-                lsd2.show()
+                val lsd = SweetLottieAlertDialog(this, SweetLottieAlertDialog.LOTTIE_ID_TYPE)
+                lsd.contentText = "Congratulation!"
+                lsd.setLottieImagebyId(R.raw.bg_lottie, true, null)
+                lsd.setCancelable(true)
+                lsd.setPopupLottieAnimation(R.raw.lottie_congratulation, false, 999f)
+                lsd.setCanceledOnTouchOutside(true)
+                lsd.setButtonTextFont(R.font.lexend_deca)
+                lsd.show()
             }
 
             popup_lottie_behind_test.id -> {
@@ -134,7 +161,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
                 .setTitleText("Title")
                 .setContentText("It's pretty, isn't it?")
                 .show()
-            styled_text_and_stroke.id -> SweetLottieAlertDialog(this, SweetLottieAlertDialog.NORMAL_TYPE)
+            styled_text_and_stroke.id -> SweetLottieAlertDialog(
+                this,
+                SweetLottieAlertDialog.NORMAL_TYPE
+            )
                 .setTitleText("<font color='red'>Red</font> title")
                 .setContentText("Big <font color='green'>green </font><b><i> bold</i></b>")
                 .setContentTextSize(21)
@@ -144,14 +174,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
                 .setTitleText("Oops...")
                 .setContentText("Something went wrong!")
                 .show()
-            success_text_test.id -> SweetLottieAlertDialog(this, SweetLottieAlertDialog.SUCCESS_TYPE)
+            success_text_test.id -> SweetLottieAlertDialog(
+                this,
+                SweetLottieAlertDialog.SUCCESS_TYPE
+            )
                 .setTitleText("Good job!")
                 .setContentText("You clicked the button!")
                 .show()
-            warning_confirm_test.id -> SweetLottieAlertDialog(this, SweetLottieAlertDialog.WARNING_TYPE)
+            warning_confirm_test.id -> SweetLottieAlertDialog(
+                this,
+                SweetLottieAlertDialog.WARNING_TYPE
+            )
                 .setTitleText("Are you sure?")
                 .setContentText("Won't be able to recover this file!")
-                .setCancelButton("Yes, delete it!"
+                .setCancelButton(
+                    "Yes, delete it!"
                 ) { sweetAlertDialog -> // reuse previous dialog instance
                     sweetAlertDialog.setTitleText("Deleted!")
                         .setContentText("Your imaginary file has been deleted!")
@@ -159,7 +196,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
                         .changeAlertType(SweetLottieAlertDialog.SUCCESS_TYPE)
                 }
                 .show()
-            warning_cancel_test.id -> SweetLottieAlertDialog(this, SweetLottieAlertDialog.WARNING_TYPE)
+            warning_cancel_test.id -> SweetLottieAlertDialog(
+                this,
+                SweetLottieAlertDialog.WARNING_TYPE
+            )
                 .setTitleText("Are you sure?")
                 .setContentText("Won't be able to recover this file!")
                 .setCancelText("No, cancel pls!")
@@ -192,7 +232,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
                         .changeAlertType(SweetLottieAlertDialog.SUCCESS_TYPE)
                 }
                 .show()
-            custom_img_test.id -> SweetLottieAlertDialog(this, SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE)
+            custom_img_test.id -> SweetLottieAlertDialog(
+                this,
+                SweetLottieAlertDialog.CUSTOM_IMAGE_TYPE
+            )
                 .setTitleText("Sweet!")
                 .setContentText("Here's a custom image.")
                 .setCustomImage(R.drawable.custom_img)
@@ -270,13 +313,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
                 linearLayout.orientation = LinearLayout.VERTICAL
                 linearLayout.addView(editText)
                 linearLayout.addView(checkBox)
-                val dialog: SweetLottieAlertDialog = SweetLottieAlertDialog(this, SweetLottieAlertDialog.NORMAL_TYPE)
-                    .setTitleText("Custom view")
-                    .hideConfirmButton()
+                val dialog: SweetLottieAlertDialog =
+                    SweetLottieAlertDialog(this, SweetLottieAlertDialog.NORMAL_TYPE)
+                        .setTitleText("Custom view")
+                        .hideConfirmButton()
                 dialog.setCustomView(linearLayout)
                 dialog.show()
             }
-            custom_btn_colors_test.id -> SweetLottieAlertDialog(this, SweetLottieAlertDialog.NORMAL_TYPE)
+            custom_btn_colors_test.id -> SweetLottieAlertDialog(
+                this,
+                SweetLottieAlertDialog.NORMAL_TYPE
+            )
                 .setTitleText("Custom view")
                 .setCancelButton("red", null)
                 .setCancelButtonBackgroundColor(Color.RED)
@@ -285,7 +332,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener  {
                 .setConfirmButton("blue", null)
                 .setConfirmButtonBackgroundColor(Color.BLUE)
                 .show()
-
 
 
         }
